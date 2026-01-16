@@ -1,6 +1,9 @@
 import random
+import matplotlib.pyplot as plt
 
-#We want this function to generate a random permutation of a sequence 1-8 in an array
+#Generates a solution (a permutation of queen locations based on column)
+#Inputs:  None
+#Returns: individual - a list of numbers that represent a solution to the 8 queens problem.
 def generate_individual():
 
     individual = []
@@ -18,7 +21,8 @@ def generate_individual():
 
 
 #Generates an initial population of size n
-#Returns an array of individuals
+#Inputs:  n - number of solutions in our initial population
+#Returns: population - a list containing individual solutions
 def generate_initial_population(n):
     population = []
 
@@ -31,6 +35,8 @@ def generate_initial_population(n):
 
 
 #Checks the fitness of a certain individual
+#Inputs:  individual - an individual solution from the population
+#Returns: confilcts - a measure of fitness that sees how many queen pairs are checking each other
 def check_fitness(individual):
 
     ####Could we also check for like bad queens individual instead of looking at pairs?
@@ -51,6 +57,8 @@ def check_fitness(individual):
     return conflicts
 
 #Mutates a single individual by swapping two values 
+#Inputs:  individual - an individual solution from the population
+#Returns: None (but it mutates the individual)
 def mutate(individual):
 
     #Generate two random number between 0 and 7 for the possible positions
@@ -67,7 +75,12 @@ def mutate(individual):
     #I love python
     individual[pos1], individual[pos2] = individual[pos2], individual[pos1]
 
+
+
 #Creates two new individuals via cross filling
+#Inputs:  individual1 - a "parent" solution from the population
+#         individual2 - a second "parent" solution from the population
+#Returns: offspring - a list containing the cross-filled offspring from the parents
 def cross_over(individual1, individual2):
 
     offspring1 = []
@@ -111,6 +124,11 @@ def cross_over(individual1, individual2):
 
 
 
+#Returns the best parents from a random pool of size pool
+#Inputs:  population - the population
+#         pool - size of the random pool we are selecting the parents from
+#         best - the number of parents we want to return
+#Returns: top_parents - a list of the top "best" number of parents
 def select_parents(population, pool, best):
 
     pop_size = len(population)
@@ -128,9 +146,36 @@ def select_parents(population, pool, best):
     return top_parents
 
 
+def generate_average(population):
+    
+    average = 0
 
+    for ind in population:
+        average += check_fitness(ind)
+
+    average = average / len(population)
+
+    return average
+
+def plot(average_fitnesses):
+
+    generations = list(range(len(average_fitnesses)))
+
+    plt.figure(figsize=(12, 6))
+
+    #plot
+    plt.plot(generations, average_fitnesses, marker='o', linestyle='-', color='blue')
+
+    plt.xlabel("Generations")
+    plt.ylabel("Average Fitness")
+    plt.title("Average Fitness Over Generations")
+    plt.grid(True)
+    plt.show()
 
 def main():
+
+    #For Plotting average fitness per generation later
+    average_fitnesses = []
 
     #Initialization
     population_size = 100
@@ -197,5 +242,12 @@ def main():
             print("--------------------")
             print(f"Parent: {ind} with a fitness of {check_fitness(ind)}")
             print("--------------------")
+
+
+        #Generate the Average fitness of the Generation
+        average_fitnesses.append(generate_average(population))
+
+    plot(average_fitnesses)
+
 
 main()
